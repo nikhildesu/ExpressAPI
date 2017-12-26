@@ -88,6 +88,14 @@ MongoClient.connect('mongodb://localhost:27017/contactListAppDB', function (err,
         })
     })
 
+    app.get('/getUsers', function (req, res) {
+        console.log('Contact body is ' +req.body);
+        db.collection('person').find({}).toArray(function (err, data) {
+            console.log(data);
+            res.send(data);
+        })
+    })
+
     app.get('/getMaxContactID', function (req, res) {
         console.log('getMaxContactID body is ' +req.body);
         db.collection('contacts').find().count().then(function (result) { 
@@ -141,6 +149,56 @@ MongoClient.connect('mongodb://localhost:27017/contactListAppDB', function (err,
                 });
             
     });
+
+    app.put('/GrantAccess/:id', function (req, res) {
+         //console.log('Update Contact body service request for ID -  ' +req.body._id);
+        //var updateid=req.body._id;
+        //var newContactName="5a15235a7f872b0eecac30b4";
+        var updateid= req.params.id;
+         console.log('Update User Role body service request for ID -  ' +updateid);
+        //db.collection('contacts').updateOne({ "_id" : "ObjectId("+newContactName +")"}, {$set: {contactName:"sdzvbgrb", contactNumber:"123456"}},{ upsert: true },function (err, result) {
+            db.collection('person').updateOne({ "_id" : ObjectId(updateid)}, {
+                $set:{
+                    userRole: "admin"
+                  }
+            },
+            function(err, result){
+                if(err){
+                    console.log('error in updating')
+                  res.send(err);
+                }
+                else{
+                    console.log('update success')
+                  res.send(result);
+                }
+                });
+            
+    });
+
+    app.put('/RevokeAccess/:id', function (req, res) {
+        //console.log('Update Contact body service request for ID -  ' +req.body._id);
+       //var updateid=req.body._id;
+       //var newContactName="5a15235a7f872b0eecac30b4";
+       var updateid= req.params.id;
+        console.log('Update Admin Role body service request for ID -  ' +updateid);
+       //db.collection('contacts').updateOne({ "_id" : "ObjectId("+newContactName +")"}, {$set: {contactName:"sdzvbgrb", contactNumber:"123456"}},{ upsert: true },function (err, result) {
+           db.collection('person').updateOne({ "_id" : ObjectId(updateid)}, {
+               $set:{
+                   userRole: "user"
+                 }
+           },
+           function(err, result){
+               if(err){
+                   console.log('error in updating')
+                 res.send(err);
+               }
+               else{
+                   console.log('update success')
+                 res.send(result);
+               }
+               });
+           
+   });
 
      app.delete('/deleteSpecificContact/:id', function (req, res) {
         var deleteid= req.params.id;
